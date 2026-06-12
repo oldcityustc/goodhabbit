@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="好习惯">
+<title>好习惯小达人</title>
+<style>
+:root {
+  --bg: #FFF8F0;
+  --card-bg: #FFFFFF;
+  --primary: #FF6B6B;
+  --secondary: #FFA94D;
+  --accent: #69DB7C;
+  --blue: #74C0FC;
+  --purple: #B197FC;
+  --text: #4A4A4A;
+  --text-light: #888;
+  --star: #FFD43B;
+  --shadow: 0 4px 20px rgba(0,0,0,0.06);
+  --radius: 20px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ===== 顶部导航 ===== */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  padding: 16px 20px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-bar h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 1px;
+}
+.top-bar h1 .icon { margin-right: 4px; }
+
+.stats-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.stat-badge {
+  background: #FFF;
+  border-radius: 30px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.stat-badge .emoji { font-size: 20px; }
+.stat-badge.star-badge { color: #E67700; }
+.stat-badge.streak-badge { color: var(--primary); }
+
+/* ===== 主布局 ===== */
+.main-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 20px 120px;
+}
+
+/* ===== 日期导航 ===== */
+.date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.date-nav .nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #FFF;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+}
+.date-nav .nav-btn:active { transform: scale(0.9); }
+.date-nav .date-text {
+  font-size: 17px;
+  font-weight: 700;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* ===== 习惯列表 ===== */
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-light);
+  margin: 20px 0 10px;
+  padding-left: 4px;
+  letter-spacing: 1px;
+}
+
+.habit-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.habit-card:active { transform: scale(0.98); }
+.habit-card.done {
+  background: #F8FFF8;
+  border: 2px solid var(--accent);
+}
+
+.habit-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.icon-life { background: #FFF3E0; }
+.icon-study { background: #E3F2FD; }
+.icon-chore { background: #E8F5E9; }
+.icon-character { background: #F3E5F5; }
+
+.habit-info { flex: 1; min-width: 0; }
+.habit-name {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.habit-desc {
+  font-size: 13px;
+  color: var(--text-light);
+}
+.habit-points {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--secondary);
+}
+.habit-points.negative {
+  color: #E03131;
+}
+
+.habit-card.penalty {
+  background: #FFF5F5;
+  border: 2px solid #FFC9C9;
+}
+
+.habit-check {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid #E0E0E0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.habit-check.checked {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.1);
+}
+.habit-check.checked::after {
+  content: '✓';
+  color: #FFF;
+  font-weight: 900;
+  font-size: 20px;
+}
+
+/* 完成动画波纹 */
+@keyframes ripple {
+  0% { box-shadow: 0 0 0 0 rgba(105, 219, 124, 0.5); }
+  100% { box-shadow: 0 0 0 20px rgba(105, 219, 124, 0); }
+}
+.habit-card.just-done { animation: ripple 0.6s ease-out; }
+
+/* ===== 底部栏 ===== */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FFF;
+  padding: 12px 20px max(12px, env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: space-around;
+  box-shadow: 0 -2px 20px rgba(0,0,0,0.06);
+  z-index: 100;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 16px;
+  border-radius: 12px;
+  color: #BBB;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.tab-btn span { font-size: 11px; font-weight: 600; }
+.tab-btn.active { color: var(--primary); background: #FFF5F5; }
+
+/* ===== 成就页面 ===== */
+.page { display: none; }
+.page.active { display: block; }
+
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.achievement-card {
+  background: #FFF;
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.achievement-card .ach-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+.achievement-card .ach-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+.achievement-card .ach-desc {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+.achievement-card.locked { opacity: 0.4; filter: grayscale(1); }
+.achievement-card.unlocked { border: 2px solid var(--star); }
+
+/* ===== 成长花园 ===== */
+.garden-container {
+  text-align: center;
+  padding: 20px 0;
+}
+.garden-tree {
+  font-size: 100px;
+  transition: all 0.5s;
+  display: inline-block;
+}
+.garden-message {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 16px;
+}
+.garden-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 24px;
+}
+.garden-stat {
+  background: #FFF;
+  border-radius: 16px;
+  padding: 16px 24px;
+  box-shadow: var(--shadow);
+}
+.garden-stat .val {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.garden-stat .lbl {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #FFF;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 15px;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* ===== 宠物 ===== */
+.pet-area {
+  text-align: center;
+  padding: 10px 0;
+}
+.pet-emoji {
+  font-size: 80px;
+  display: inline-block;
+  transition: transform 0.3s;
+}
+.pet-emoji:active { transform: scale(1.2); }
+.pet-hunger-bar {
+  width: 200px;
+  height: 12px;
+  background: #EEE;
+  border-radius: 6px;
+  margin: 12px auto;
+  overflow: hidden;
+}
+.pet-hunger-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--secondary));
+  border-radius: 6px;
+  transition: width 0.5s;
+}
+.pet-status {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-top: 6px;
+}
+
+/* 星星飞出动画 */
+@keyframes starFly {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+  50% { opacity: 1; transform: translate(var(--fx), var(--fy)) scale(1.2); }
+  100% { opacity: 0; transform: translate(var(--fx), var(--fy)) scale(0); }
+}
+.flying-star {
+  position: fixed;
+  font-size: 28px;
+  pointer-events: none;
+  z-index: 1000;
+  animation: starFly 0.8s ease-out forwards;
+}
+
+/* 提示卡片 */
+.tip-card {
+  background: linear-gradient(135deg, #FFF9E6, #FFF3CD);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: var(--shadow);
+  color: #B37400;
+}
+
+/* ===== 随机任务 ===== */
+.random-task-section {
+  background: linear-gradient(135deg, #FFF0F6, #F8E8FF);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  border: 2px dashed #E9B8D0;
+}
+.random-task-section .random-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #9C3B6B;
+  margin-bottom: 6px;
+}
+.random-task-section .random-hint {
+  font-size: 12px;
+  color: #B87A9A;
+  margin-bottom: 12px;
+}
+.random-reveal-btn {
+  background: linear-gradient(135deg, #F783AC, #DA77F2);
+  color: #FFF;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(247, 131, 172, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+.random-reveal-btn:active { transform: scale(0.95); }
+.random-task-revealed {
+  margin-top: 12px;
+  padding: 14px;
+  background: #FFF;
+  border-radius: 14px;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.random-task-revealed .random-task-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+}
+.random-task-revealed .random-task-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 4px;
+}
+.random-task-revealed .random-task-desc {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+.random-task-revealed .random-task-points {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 6px;
+}
+.random-task-revealed .random-task-done-btn {
+  margin-top: 10px;
+  background: var(--accent);
+  color: #FFF;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s;
+}
+.random-task-revealed .random-task-done-btn:active { transform: scale(0.95); }
+.random-task-revealed .random-task-done-btn.done {
+  background: #CCC;
+}
+.random-task-revealed .random-task-done-btn.done::after {
+  content: ' ✓ 已完成';
+}
+
+/* ===== 删除按钮 ===== */
+.habit-card .delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #FFE0E0;
+  color: #E03131;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  z-index: 5;
+  font-family: inherit;
+}
+.habit-card:hover .delete-btn,
+.habit-card:active .delete-btn { display: flex; }
+.habit-card .delete-btn:active { background: #FFC9C9; }
+
+/* ===== 随机任务库列表 ===== */
+.task-library-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.task-library-card .task-lib-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #FFF0F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.task-library-card .task-lib-info { flex: 1; min-width: 0; }
+.task-library-card .task-lib-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+.task-library-card .task-lib-desc {
+  font-size: 12px;
+  color: var(--text-light);
+}
+.task-library-card .task-lib-points {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--secondary);
+}
+.task-library-card .task-lib-delete {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #FFE0E0;
+  color: #E03131;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-family: inherit;
+}
+.task-library-card:hover .task-lib-delete,
+.task-library-card:active .task-lib-delete { display: flex; }
+.task-library-card .task-lib-delete:active { background: #FFC9C9; }
+
+/* ===== 月历 ===== */
+.calendar-section {
+  background: #FFF;
+  border-radius: var(--radius);
+  padding: 16px 12px;
+  margin-top: 20px;
+  box-shadow: var(--shadow);
+}
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.calendar-header .month-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+}
+.calendar-header .cal-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #F5F5F5;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.calendar-header .cal-nav-btn:active { background: #E0E0E0; }
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #AAA;
+  margin-bottom: 6px;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+.calendar-cell {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #CCC;
+  position: relative;
+  transition: transform 0.15s;
+}
+.calendar-cell.current-month { color: var(--text); cursor: default; }
+.calendar-cell.today {
+  background: #FFF3E0;
+  color: var(--primary);
+  font-weight: 800;
+}
+.calendar-cell.has-checkin {
+  position: relative;
+}
+.calendar-cell.has-checkin::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.calendar-cell.has-checkin.all-done {
+  background: #E8F5E9;
+  font-weight: 800;
+}
+.calendar-cell.has-checkin.all-done::after {
+  width: 18px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: #999;
+}
+.calendar-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.calendar-legend .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+}
+.calendar-legend .dot.big {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <h1><span class="icon">⭐</span>好习惯小达人</h1>
+  <div class="stats-row">
+    <div class="stat-badge star-badge">
+      <span class="emoji">⭐</span>
+      <span id="totalStars">0</span>
+    </div>
+    <div class="stat-badge streak-badge">
+      <span class="emoji">🔥</span>
+      <span id="streakDays">0</span>天
+    </div>
+  </div>
+</div>
+
+<div class="main-container">
+
+  <!-- ===== 第1页：今日打卡 ===== -->
+  <div id="page-checkin" class="page active">
+    <div class="date-nav">
+      <button class="nav-btn" onclick="changeDate(-1)">◀</button>
+      <div class="date-text" id="dateDisplay">今天</div>
+      <button class="nav-btn" onclick="changeDate(1)" id="nextBtn" disabled>▶</button>
+    </div>
+
+    <!-- 随机任务 -->
+    <div class="random-task-section" id="randomTaskSection"></div>
+
+    <div id="habitList"></div>
+
+    <!-- 备注与规则 -->
+    <div style="background:#FFFBF0;border-radius:16px;padding:16px 18px;margin-top:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);border:1px solid #FFE8B0;">
+      <div style="font-size:14px;font-weight:800;color:#B37400;margin-bottom:10px;">📋 备注与积分规则</div>
+      <div style="font-size:12px;color:#8B6914;line-height:1.8;">
+        <div>⏰ <b>关键提醒节点：</b>晚饭前、睡觉前必须收好玩具和书本</div>
+        <div>📝 <b>作业提醒规则：</b>写作业提醒次数不超过2次</div>
+        <div style="margin-top:6px;font-weight:700;">⭐ 积分规则：</div>
+        <div>　• 写作业认真、主动：<span style="color:#E67700;">+2分</span></div>
+        <div>　• 10点之后睡觉：<span style="color:#E03131;">-1分</span></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="addCustomHabit()" style="
+        background:none;border:2px dashed #DDD;border-radius:16px;padding:10px 18px;
+        font-size:14px;cursor:pointer;color:#999;font-family:inherit;
+      ">＋ 添加习惯</button>
+      <button onclick="addRandomTask()" style="
+        background:none;border:2px dashed #E9B8D0;border-radius:16px;padding:10px 18px;
+        font-size:14px;cursor:pointer;color:#C06B8E;font-family:inherit;
+      ">🎲 添加随机任务</button>
+    </div>
+  </div>
+
+  <!-- ===== 第2页：成长花园 ===== -->
+  <div id="page-garden" class="page">
+    <div class="garden-container">
+      <div class="garden-tree" id="gardenTree">🌱</div>
+      <div class="garden-message" id="gardenMsg">每天打卡，让小树长大吧！</div>
+      <div class="garden-stats">
+        <div class="garden-stat">
+          <div class="val" id="gardenTotalCheckins">0</div>
+          <div class="lbl">累计打卡</div>
+        </div>
+        <div class="garden-stat">
+          <div class="val" id="gardenTotalDays">0</div>
+          <div class="lbl">坚持天数</div>
+        </div>
+        <div class="garden-stat">
+          <div class="val" id="gardenBestStreak">0</div>
+          <div class="lbl">最长连续</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 虚拟宠物 -->
+    <div class="pet-area">
+      <div class="pet-emoji" id="petEmoji" onclick="feedPet()">🐶</div>
+      <div class="pet-hunger-bar">
+        <div class="pet-hunger-fill" id="petHungerFill" style="width:100%"></div>
+      </div>
+      <div class="pet-status" id="petStatus">摸摸我~ 每天打卡可以喂饱我哦！</div>
+    </div>
+
+    <!-- 月历 -->
+    <div class="calendar-section">
+      <div class="calendar-header">
+        <button class="cal-nav-btn" onclick="changeCalendarMonth(-1)">◀</button>
+        <div class="month-title" id="calMonthTitle">2026年6月</div>
+        <button class="cal-nav-btn" onclick="changeCalendarMonth(1)">▶</button>
+      </div>
+      <div class="calendar-weekdays">
+        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+      <div class="calendar-legend">
+        <span><span class="dot"></span> 有打卡</span>
+        <span><span class="dot big"></span> 全部完成</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 第3页：随机任务库 ===== -->
+  <div id="page-tasks" class="page">
+    <div style="text-align:center;margin-bottom:16px;">
+      <button onclick="addRandomTask()" style="
+        background:linear-gradient(135deg,#F783AC,#DA77F2);color:#FFF;border:none;
+        border-radius:25px;padding:10px 24px;font-size:15px;font-weight:700;
+        cursor:pointer;font-family:inherit;box-shadow:0 4px 15px rgba(247,131,172,0.3);
+      ">🎲 添加随机任务</button>
+    </div>
+    <div id="allRandomTasksList"></div>
+  </div>
+
+  <!-- ===== 第4页：成就徽章 ===== -->
+  <div id="page-achievements" class="page">
+    <div class="tip-card" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);color:#2E7D32;">
+      🏆 坚持打卡，解锁超酷徽章！
+    </div>
+    <div class="achievement-grid" id="achievementGrid"></div>
+  </div>
+
+</div>
+
+<div class="bottom-bar">
+  <button class="tab-btn active" onclick="switchTab('checkin', this)">
+    ✅<span>今日打卡</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('garden', this)">
+    🌳<span>成长花园</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('tasks', this)">
+    🎲<span>随机任务</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('achievements', this)">
+    🏆<span>成就徽章</span>
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== 数据模型 ====================
+const DEFAULT_HABITS = [
+  // ===== 生活习惯 =====
+  { id: 'h1', name: '按时起床，自主穿衣洗漱', desc: '早上7:30前起床，自己穿衣刷牙洗脸', icon: '🌅', category: 'life', points: 2 },
+  { id: 'h2', name: '读写坐姿端正，爱护眼睛', desc: '读书写字保持一拳一尺一寸', icon: '👀', category: 'life', points: 2 },
+  { id: 'h3', name: '按时早睡，不用电子产品', desc: '晚上10:00前睡觉，不玩手机平板', icon: '😴', category: 'life', points: 2 },
+  { id: 'h4', name: '10点之后才睡觉', desc: '⚠️ 超过晚上10:00睡觉扣1分', icon: '⏰', category: 'life', points: -1 },
+
+  // ===== 学习习惯 =====
+  { id: 'h5', name: '写作业认真、主动', desc: '提醒≤2次，不边写边玩', icon: '📝', category: 'study', points: 2 },
+  { id: 'h6', name: '书写工整，卷面整洁', desc: '字迹清楚，作业本干净整齐', icon: '✏️', category: 'study', points: 2 },
+  { id: 'h7', name: '完工后整理书包与文具', desc: '作业写完把书包和文具整理好', icon: '🎒', category: 'study', points: 2 },
+
+  // ===== 家务习惯 =====
+  { id: 'h8', name: '整理房间、玩具、书本', desc: '晚饭前和睡觉前必须收好', icon: '🧸', category: 'chore', points: 2 },
+  { id: 'h9', name: '帮忙擦桌子、收拾餐桌', desc: '饭后帮忙清理餐桌', icon: '🧹', category: 'chore', points: 2 },
+  { id: 'h10', name: '帮忙扫地、清理地面', desc: '用小扫帚帮忙打扫地面', icon: '🧹', category: 'chore', points: 2 },
+  { id: 'h11', name: '摆放鞋子、主动倒垃圾', desc: '进门摆好鞋子，看到垃圾满了主动倒', icon: '👟', category: 'chore', points: 2 },
+  { id: 'h12', name: '协助家人做力所能及家务', desc: '帮爸爸妈妈做一件小事', icon: '🤝', category: 'chore', points: 2 },
+];
+
+// ===== 随机任务池 =====
+const DEFAULT_RANDOM_TASKS = [
+  { name: '看动画片10分钟', desc: '选一部喜欢的动画片看一小会儿', icon: '📺', points: 2 },
+  { name: '玩JoJo10分钟', desc: '看JoJo绘本或玩JoJo游戏', icon: '📖', points: 2 },
+  { name: '踢球15分钟', desc: '到户外踢足球，锻炼身体', icon: '⚽', points: 3 },
+  { name: '洗袜子', desc: '自己动手洗一双袜子', icon: '🧦', points: 3 },
+  { name: '画画15分钟', desc: '拿出画笔自由创作', icon: '🎨', points: 2 },
+  { name: '跳绳5分钟', desc: '跳跳绳锻炼身体', icon: '🪢', points: 2 },
+  { name: '给植物浇水', desc: '帮家里的花草浇水', icon: '🌻', points: 2 },
+  { name: '背诵一首古诗', desc: '背一首新学的古诗给家人听', icon: '📜', points: 3 },
+  { name: '做5个俯卧撑', desc: '锻炼身体从小做起', icon: '💪', points: 2 },
+  { name: '整理自己的书桌', desc: '把书桌擦干净、东西摆整齐', icon: '📐', points: 2 },
+];
+
+const ACHIEVEMENTS = [
+  { id: 'a1', name: '初次打卡', desc: '完成第一次打卡', icon: '🎉', check: (s) => s.totalCheckins >= 1 },
+  { id: 'a2', name: '坚持不懈', desc: '连续打卡7天', icon: '🔥', check: (s) => s.bestStreak >= 7 },
+  { id: 'a3', name: '习惯达人', desc: '连续打卡30天', icon: '👑', check: (s) => s.bestStreak >= 30 },
+  { id: 'a4', name: '全能选手', desc: '一天完成所有正面习惯', icon: '💪', check: (s) => s.maxDailyCheckins >= DEFAULT_HABITS.filter(h=>h.points>0).length },
+  { id: 'a5', name: '星星富翁', desc: '累计获得100颗星', icon: '🌟', check: (s) => s.totalStars >= 100 },
+  { id: 'a6', name: '早起达人', desc: '坚持早起打卡21天', icon: '🐦', check: (s) => (s.habitCounts?.h1 || 0) >= 21 },
+  { id: 'a7', name: '作业能手', desc: '认真写作业打卡30天', icon: '📚', check: (s) => (s.habitCounts?.h5 || 0) >= 30 },
+  { id: 'a8', name: '家务小帮手', desc: '家务打卡累计30次', icon: '❤️', check: (s) => {
+    const choreIds = ['h8','h9','h10','h11','h12'];
+    const total = choreIds.reduce((sum, id) => sum + (s.habitCounts?.[id] || 0), 0);
+    return total >= 30;
+  }},
+];
+
+const TREE_STAGES = [
+  { min: 0, emoji: '🌱', msg: '每天打卡，让小树长大吧！' },
+  { min: 5, emoji: '🌿', msg: '小树发芽啦！继续加油！' },
+  { min: 15, emoji: '🪴', msg: '小树在茁壮成长！' },
+  { min: 30, emoji: '🌳', msg: '小树长大啦！你真棒！' },
+  { min: 60, emoji: '🌲', msg: '参天大树！你是习惯小达人！' },
+  { min: 100, emoji: '🏡', msg: '你的坚持建造了一座花园！' },
+];
+
+// ==================== 存储 ====================
+// 当前存储 key（升级版本时只需修改这里，旧数据会自动迁移）
+const STORAGE_VERSION = 4;
+const STORAGE_KEY = 'good_habits_data_v' + STORAGE_VERSION;
+
+// 旧版本 key 列表（按顺序排列，用于自动迁移）
+const OLD_KEYS = ['good_habits_data', 'good_habits_data_v1', 'good_habits_data_v2', 'good_habits_data_v3'];
+
+function migrateData() {
+  // 如果当前版本已有数据，无需迁移
+  if (localStorage.getItem(STORAGE_KEY)) return;
+
+  // 从旧版本 key 中查找数据（从最新到最旧）
+  for (let i = OLD_KEYS.length - 1; i >= 0; i--) {
+    const oldRaw = localStorage.getItem(OLD_KEYS[i]);
+    if (oldRaw) {
+      try {
+        const oldData = JSON.parse(oldRaw);
+        // 合并默认数据（补齐新版本可能新增的字段）
+        const merged = { ...getDefaultData(), ...oldData };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        console.log('✅ 数据已从 ' + OLD_KEYS[i] + ' 迁移到 ' + STORAGE_KEY);
+        return;
+      } catch(e) {
+        console.warn('⚠️ 迁移 ' + OLD_KEYS[i] + ' 失败，尝试更旧版本');
+      }
+    }
+  }
+  console.log('🆕 未找到旧数据，使用全新数据');
+}
+
+function loadData() {
+  migrateData();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return getDefaultData();
+}
+
+function getDefaultData() {
+  return {
+    checkins: {},        // { '2024-06-12': ['h1','h3'] }
+    totalStars: 0,
+    totalCheckins: 0,
+    totalDays: 0,
+    bestStreak: 0,
+    maxDailyCheckins: 0,
+    habitCounts: {},     // { 'h1': 5, 'h3': 2 }
+    unlockedAchievements: [],
+    customHabits: [],
+    customRandomTasks: [],
+    randomTaskHistory: {}, // { '2024-06-12': { taskIndex: 2, done: false } }
+    lastFeedDate: null,
+    petHunger: 100,
+  };
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadData();
+
+// ==================== 工具函数 ====================
+function todayKey() { return getDateKey(selectedDate); }
+function getDateKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function getTodayDate() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+let selectedDate = getTodayDate();
+
+function formatDate(d) {
+  const now = getTodayDate();
+  const diff = Math.floor((d.getTime() - now.getTime()) / 86400000);
+  if (diff === 0) return '今天';
+  if (diff === -1) return '昨天';
+  if (diff === 1) return '明天';
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  const weekdays = ['日','一','二','三','四','五','六'];
+  return m + '月' + day + '日 周' + weekdays[d.getDay()];
+}
+
+function getAllHabits() {
+  return [...DEFAULT_HABITS, ...state.customHabits];
+}
+
+// ==================== 渲染 ====================
+function renderAll() {
+  renderRandomTask();
+  renderCheckinPage();
+  renderGardenPage();
+  renderAchievementPage();
+  renderAllRandomTasksPage();
+  updateTopStats();
+  document.getElementById('dateDisplay').textContent = formatDate(selectedDate);
+  document.getElementById('nextBtn').disabled = todayKey() === getDateKey(selectedDate);
+}
+
+function renderRandomTask() {
+  const key = todayKey();
+  const allRandomTasks = [...DEFAULT_RANDOM_TASKS, ...state.customRandomTasks];
+
+  // 如果是今天且还没有生成过随机任务，则生成
+  if (!state.randomTaskHistory[key] && allRandomTasks.length > 0) {
+    const idx = Math.floor(Math.random() * allRandomTasks.length);
+    state.randomTaskHistory[key] = { taskIndex: idx, done: false };
+    saveData();
+  }
+
+  const history = state.randomTaskHistory[key];
+  if (!history || allRandomTasks.length === 0) {
+    document.getElementById('randomTaskSection').innerHTML = '';
+    return;
+  }
+
+  const task = allRandomTasks[history.taskIndex];
+  if (!task) {
+    document.getElementById('randomTaskSection').innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  html += '<div class="random-title">🎲 今日随机小任务</div>';
+
+  if (history.revealed) {
+    // 已揭示
+    html += '<div class="random-task-revealed">';
+    html += '<span class="random-task-icon">' + task.icon + '</span>';
+    html += '<div class="random-task-name">' + task.name + '</div>';
+    html += '<div class="random-task-desc">' + task.desc + '</div>';
+    html += '<div class="random-task-points">完成奖励 +' + task.points + '⭐</div>';
+    if (history.done) {
+      html += '<button class="random-task-done-btn done" onclick="completeRandomTask()" style="background:#FFA94D;">✓ 已完成（点击取消）</button>';
+    } else {
+      html += '<button class="random-task-done-btn" onclick="completeRandomTask()">✅ 我完成啦！</button>';
+    }
+    html += '</div>';
+  } else {
+    // 未揭示
+    html += '<div class="random-hint">点击按钮看看今天的神秘任务是什么？</div>';
+    html += '<button class="random-reveal-btn" onclick="revealRandomTask()">🎁 点我揭晓</button>';
+  }
+
+  document.getElementById('randomTaskSection').innerHTML = html;
+}
+
+function revealRandomTask() {
+  const key = todayKey();
+  if (!state.randomTaskHistory[key]) return;
+  state.randomTaskHistory[key].revealed = true;
+  saveData();
+  renderRandomTask();
+}
+
+function completeRandomTask() {
+  const key = todayKey();
+  const history = state.randomTaskHistory[key];
+  if (!history) return;
+
+  const allRandomTasks = [...DEFAULT_RANDOM_TASKS, ...state.customRandomTasks];
+  const task = allRandomTasks[history.taskIndex];
+  if (!task) return;
+
+  if (history.done) {
+    // 取消完成
+    history.done = false;
+    state.totalStars -= task.points;
+    state.totalStars = Math.max(0, state.totalStars);
+    state.totalCheckins = Math.max(0, state.totalCheckins - 1);
+    recalcStats();
+    saveData();
+    renderAll();
+    showToast('已取消随机任务打卡');
+  } else {
+    // 完成
+    history.done = true;
+    state.totalStars += task.points;
+    state.totalCheckins += 1;
+    recalcStats();
+    checkAchievements();
+    saveData();
+    renderAll();
+    showToast('🎉 随机任务完成！+' + task.points + '⭐');
+  }
+}
+
+function renderCheckinPage() {
+  const key = todayKey();
+  const todayCheckins = state.checkins[key] || [];
+  const habits = getAllHabits();
+  const categories = {
+    life: { title: '🛏️ 生活习惯', habits: [] },
+    study: { title: '📚 学习习惯', habits: [] },
+    chore: { title: '🏠 家务习惯', habits: [] },
+  };
+  habits.forEach(h => {
+    if (categories[h.category]) categories[h.category].habits.push(h);
+  });
+
+  let html = '';
+  for (const [cat, data] of Object.entries(categories)) {
+    if (data.habits.length === 0) continue;
+    html += '<div class="section-title">' + data.title + '</div>';
+    data.habits.forEach(h => {
+      const isDone = todayCheckins.includes(h.id);
+      const pointsClass = h.points >= 0 ? 'habit-points' : 'habit-points negative';
+      const pointsStr = h.points >= 0 ? '+' + h.points + '⭐' : h.points + '⭐';
+      const cardClass = h.points < 0 && isDone ? 'habit-card penalty' : (isDone ? 'habit-card done' : 'habit-card');
+      const isCustom = h.id.startsWith('custom_');
+      const deleteBtn = isCustom ? `<button class="delete-btn" onclick="event.stopPropagation();deleteCustomHabit('${h.id}')">✕</button>` : '';
+      html += `
+        <div class="${cardClass}" onclick="toggleHabit('${h.id}')" id="card-${h.id}">
+          ${deleteBtn}
+          <div class="habit-icon icon-${h.category}">${h.icon}</div>
+          <div class="habit-info">
+            <div class="habit-name">${h.name}</div>
+            <div class="habit-desc">${h.desc}</div>
+          </div>
+          <div class="${pointsClass}">${pointsStr}</div>
+          <div class="habit-check ${isDone ? 'checked' : ''}"></div>
+        </div>`;
+    });
+  }
+  document.getElementById('habitList').innerHTML = html;
+}
+
+function updateTopStats() {
+  document.getElementById('totalStars').textContent = state.totalStars;
+  document.getElementById('streakDays').textContent = state.bestStreak;
+}
+
+function renderGardenPage() {
+  // 成长树
+  const days = state.totalDays;
+  let stage = TREE_STAGES[0];
+  for (let i = TREE_STAGES.length - 1; i >= 0; i--) {
+    if (days >= TREE_STAGES[i].min) { stage = TREE_STAGES[i]; break; }
+  }
+  document.getElementById('gardenTree').textContent = stage.emoji;
+  document.getElementById('gardenMsg').textContent = stage.msg;
+  document.getElementById('gardenTotalCheckins').textContent = state.totalCheckins;
+  document.getElementById('gardenTotalDays').textContent = state.totalDays;
+  document.getElementById('gardenBestStreak').textContent = state.bestStreak;
+
+  // 宠物
+  updatePet();
+
+  // 月历
+  renderCalendar();
+}
+
+// ==================== 月历 ====================
+let calYear, calMonth;
+
+function initCalendar() {
+  const today = getTodayDate();
+  calYear = today.getFullYear();
+  calMonth = today.getMonth() + 1; // 1-12
+}
+initCalendar();
+
+function changeCalendarMonth(delta) {
+  calMonth += delta;
+  if (calMonth > 12) { calMonth = 1; calYear++; }
+  if (calMonth < 1) { calMonth = 12; calYear--; }
+  // 不能超过当前月份
+  const today = getTodayDate();
+  const maxMonth = today.getFullYear() * 12 + today.getMonth() + 1;
+  const curMonth = calYear * 12 + calMonth;
+  if (curMonth > maxMonth) {
+    calYear = today.getFullYear();
+    calMonth = today.getMonth() + 1;
+  }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  document.getElementById('calMonthTitle').textContent = calYear + '年' + calMonth + '月';
+
+  const totalHabits = getAllHabits().length;
+  const firstDay = new Date(calYear, calMonth - 1, 1);
+  const lastDay = new Date(calYear, calMonth, 0);
+  const startDayOfWeek = firstDay.getDay(); // 0=Sun
+  const daysInMonth = lastDay.getDate();
+
+  const today = getTodayDate();
+  const todayKeyStr = getDateKey(today);
+
+  let html = '';
+
+  // 填充前面的空白格
+  for (let i = 0; i < startDayOfWeek; i++) {
+    html += '<div class="calendar-cell"></div>';
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(calYear, calMonth - 1, d);
+    const key = getDateKey(date);
+    const checkins = state.checkins[key] || [];
+    const count = checkins.length;
+    const allDone = count >= totalHabits && totalHabits > 0;
+    const isToday = key === todayKeyStr;
+
+    let cls = 'calendar-cell current-month';
+    if (isToday) cls += ' today';
+    if (count > 0 && allDone) cls += ' has-checkin all-done';
+    else if (count > 0) cls += ' has-checkin';
+
+    html += '<div class="' + cls + '">' + d + '</div>';
+  }
+
+  document.getElementById('calendarGrid').innerHTML = html;
+}
+
+function updatePet() {
+  const todayStr = getDateKey(getTodayDate());
+  if (state.lastFeedDate !== todayStr) {
+    state.petHunger = Math.max(0, state.petHunger - 15);
+    state.lastFeedDate = todayStr;
+    saveData();
+  }
+  const hunger = state.petHunger;
+  document.getElementById('petHungerFill').style.width = hunger + '%';
+
+  const petEl = document.getElementById('petEmoji');
+  const statusEl = document.getElementById('petStatus');
+
+  if (hunger > 70) {
+    petEl.textContent = '🐶'; statusEl.textContent = '我好开心！每天打卡可以喂饱我哦！';
+  } else if (hunger > 40) {
+    petEl.textContent = '🐕'; statusEl.textContent = '有点饿了...快去打卡吧！';
+  } else if (hunger > 10) {
+    petEl.textContent = '🥺'; statusEl.textContent = '好饿呀！快来打卡喂我！';
+  } else {
+    petEl.textContent = '😿'; statusEl.textContent = '呜呜...我快饿晕了...';
+  }
+}
+
+function feedPet() {
+  const todayStr = getDateKey(getTodayDate());
+  const todayCheckins = state.checkins[todayStr] || [];
+  if (todayCheckins.length === 0) {
+    showToast('今天还没打卡哦，快去完成习惯吧！');
+    return;
+  }
+  if (state.petHunger >= 100) {
+    showToast('我已经吃饱啦！明天再喂我吧~');
+    return;
+  }
+  state.petHunger = Math.min(100, state.petHunger + 20);
+  saveData();
+  updatePet();
+  showToast('汪汪！谢谢投喂~ 🦴');
+  document.getElementById('petEmoji').style.transform = 'scale(1.3)';
+  setTimeout(() => document.getElementById('petEmoji').style.transform = '', 300);
+}
+
+function renderAchievementPage() {
+  let html = '';
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = state.unlockedAchievements.includes(a.id);
+    html += `
+      <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}">
+        <div class="ach-icon">${a.icon}</div>
+        <div class="ach-name">${unlocked ? a.name : '???'}</div>
+        <div class="ach-desc">${unlocked ? a.desc : '继续加油解锁吧~'}</div>
+      </div>`;
+  });
+  document.getElementById('achievementGrid').innerHTML = html;
+}
+
+// ==================== 操作 ====================
+function toggleHabit(habitId) {
+  const key = todayKey();
+  if (!state.checkins[key]) state.checkins[key] = [];
+  const arr = state.checkins[key];
+  const habits = getAllHabits();
+  const habit = habits.find(h => h.id === habitId);
+  if (!habit) return;
+
+  const idx = arr.indexOf(habitId);
+  if (idx >= 0) {
+    // 取消打卡
+    arr.splice(idx, 1);
+    state.totalStars -= habit.points;  // 如果points是负的，取消会加回来
+    state.totalStars = Math.max(0, state.totalStars);
+    state.totalCheckins = Math.max(0, state.totalCheckins - 1);
+    state.habitCounts[habitId] = Math.max(0, (state.habitCounts[habitId] || 0) - 1);
+    recalcStats();
+    saveData();
+    renderAll();
+    showToast('已取消打卡');
+  } else {
+    // 完成打卡
+    arr.push(habitId);
+    state.totalStars += habit.points;
+    state.totalStars = Math.max(0, state.totalStars);
+    state.totalCheckins += 1;
+    state.habitCounts[habitId] = (state.habitCounts[habitId] || 0) + 1;
+    recalcStats();
+    checkAchievements();
+    saveData();
+    renderAll();
+
+    // 动画
+    const card = document.getElementById('card-' + habitId);
+    if (card) {
+      card.classList.add('just-done');
+      setTimeout(() => card.classList.remove('just-done'), 600);
+    }
+    if (habit.points >= 0) {
+      spawnStars(card);
+      showToast('太棒了！+' + habit.points + '⭐');
+    } else {
+      showToast('😢 下次要早点睡哦！' + habit.points + '⭐');
+    }
+  }
+}
+
+function recalcStats() {
+  // 计算打卡天数
+  const days = Object.keys(state.checkins).filter(k => (state.checkins[k] || []).length > 0);
+  state.totalDays = days.length;
+
+  // 计算最长连续
+  if (days.length === 0) { state.bestStreak = 0; return; }
+  days.sort();
+  let streak = 1, best = 1;
+  for (let i = 1; i < days.length; i++) {
+    const prev = new Date(days[i-1]);
+    const curr = new Date(days[i]);
+    const diff = (curr - prev) / 86400000;
+    if (Math.abs(diff - 1) < 0.01) {
+      streak++;
+    } else {
+      best = Math.max(best, streak);
+      streak = 1;
+    }
+  }
+  best = Math.max(best, streak);
+  state.bestStreak = best;
+
+  // 最多单日打卡
+  let maxDaily = 0;
+  for (const k of days) {
+    maxDaily = Math.max(maxDaily, (state.checkins[k] || []).length);
+  }
+  state.maxDailyCheckins = maxDaily;
+}
+
+function checkAchievements() {
+  ACHIEVEMENTS.forEach(a => {
+    if (!state.unlockedAchievements.includes(a.id) && a.check(state)) {
+      state.unlockedAchievements.push(a.id);
+      showToast('🏆 解锁成就：' + a.name + '！');
+    }
+  });
+}
+
+function spawnStars(card) {
+  if (!card) return;
+  const rect = card.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  for (let i = 0; i < 5; i++) {
+    const star = document.createElement('div');
+    star.className = 'flying-star';
+    star.textContent = '⭐';
+    star.style.left = cx + 'px';
+    star.style.top = cy + 'px';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 40 + Math.random() * 60;
+    star.style.setProperty('--fx', Math.cos(angle) * dist + 'px');
+    star.style.setProperty('--fy', Math.sin(angle) * dist - 30 + 'px');
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 800);
+  }
+}
+
+// ==================== 日期导航 ====================
+function changeDate(delta) {
+  const newDate = new Date(selectedDate);
+  newDate.setDate(newDate.getDate() + delta);
+  const today = getTodayDate();
+  if (newDate > today) return;
+  selectedDate = newDate;
+  renderAll();
+}
+
+// ==================== Tab切换 ====================
+function switchTab(tab, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (tab === 'garden') renderGardenPage();
+  if (tab === 'tasks') renderAllRandomTasksPage();
+}
+
+// ==================== Toast ====================
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._timeout);
+  el._timeout = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// ==================== 自定义习惯 ====================
+function addCustomHabit() {
+  const name = prompt('请输入新习惯名称：');
+  if (!name || !name.trim()) return;
+  const icon = prompt('请输入一个emoji图标（如 🏃）：', '⭐');
+  const points = parseInt(prompt('完成后获得几颗星？（1-5）', '2')) || 2;
+
+  const newHabit = {
+    id: 'custom_' + Date.now(),
+    name: name.trim(),
+    desc: '自定义习惯',
+    icon: icon || '⭐',
+    category: 'life',
+    points: Math.max(1, Math.min(5, points)),
+  };
+  state.customHabits.push(newHabit);
+  saveData();
+  renderAll();
+  showToast('新习惯已添加！🎉');
+}
+
+function deleteCustomHabit(habitId) {
+  if (!confirm('确定要删除这个习惯吗？')) return;
+  // 从自定义习惯列表中移除
+  state.customHabits = state.customHabits.filter(h => h.id !== habitId);
+  // 清理所有日期的打卡记录
+  for (const key of Object.keys(state.checkins)) {
+    state.checkins[key] = (state.checkins[key] || []).filter(id => id !== habitId);
+  }
+  // 清理习惯计数
+  delete state.habitCounts[habitId];
+  // 重新计算统计
+  recalcStats();
+  saveData();
+  renderAll();
+  showToast('习惯已删除');
+}
+
+function addRandomTask() {
+  const name = prompt('请输入随机任务名称：');
+  if (!name || !name.trim()) return;
+  const icon = prompt('请输入一个emoji图标（如 🎮）：', '🎯');
+  const points = parseInt(prompt('完成后获得几颗星？（1-5）', '2')) || 2;
+
+  const newTask = {
+    name: name.trim(),
+    desc: '自定义随机任务',
+    icon: icon || '🎯',
+    points: Math.max(1, Math.min(5, points)),
+  };
+  state.customRandomTasks.push(newTask);
+  saveData();
+  renderAll();
+  showToast('随机任务已添加！🎲');
+}
+
+// ==================== 随机任务库页面 ====================
+function renderAllRandomTasksPage() {
+  const allTasks = [...DEFAULT_RANDOM_TASKS, ...state.customRandomTasks];
+  let html = '';
+  allTasks.forEach((task, index) => {
+    const isCustom = index >= DEFAULT_RANDOM_TASKS.length;
+    const customIdx = index - DEFAULT_RANDOM_TASKS.length;
+    const deleteBtn = isCustom ? `<button class="task-lib-delete" onclick="event.stopPropagation();deleteRandomTask(${customIdx})">✕</button>` : '';
+    html += `
+      <div class="task-library-card">
+        ${deleteBtn}
+        <div class="task-lib-icon">${task.icon}</div>
+        <div class="task-lib-info">
+          <div class="task-lib-name">${task.name}</div>
+          <div class="task-lib-desc">${task.desc}</div>
+        </div>
+        <div class="task-lib-points">+${task.points}⭐</div>
+      </div>`;
+  });
+  const listEl = document.getElementById('allRandomTasksList');
+  if (listEl) listEl.innerHTML = html;
+}
+
+function deleteRandomTask(customIndex) {
+  if (!confirm('确定要删除这个随机任务吗？')) return;
+  state.customRandomTasks.splice(customIndex, 1);
+  // 清理该任务在 randomTaskHistory 中的引用
+  for (const key of Object.keys(state.randomTaskHistory)) {
+    const h = state.randomTaskHistory[key];
+    if (h && h.taskIndex >= DEFAULT_RANDOM_TASKS.length && h.taskIndex - DEFAULT_RANDOM_TASKS.length === customIndex) {
+      delete state.randomTaskHistory[key];
+    } else if (h && h.taskIndex >= DEFAULT_RANDOM_TASKS.length && h.taskIndex - DEFAULT_RANDOM_TASKS.length > customIndex) {
+      h.taskIndex--;
+    }
+  }
+  saveData();
+  renderAll();
+  showToast('随机任务已删除');
+}
+
+// ==================== 初始化 ====================
+console.log('DEFAULT_HABITS count:', DEFAULT_HABITS.length);
+console.log('customHabits count:', state.customHabits.length);
+renderAll();
+
+// 每天凌晨自动更新宠物饥饿度
+setInterval(() => {
+  const nowStr = getDateKey(getTodayDate());
+  if (state.lastFeedDate !== nowStr) {
+    updatePet();
+    saveData();
+  }
+}, 60000);
+
+console.log('🌟 好习惯小达人 App 已就绪！');
+console.log('📦 数据存储在 localStorage，关闭Safari后数据不会丢失');
+console.log('💡 提示：在iPad Safari中打开，点击"分享"→"添加到主屏幕"即可像原生App一样使用');
+</script>
+
+</body>
+</html>
